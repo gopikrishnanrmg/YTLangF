@@ -1,4 +1,7 @@
 fastapi==0.95.0
+pydantic==1.10.4
+pymongo==4.3.3
+python-dotenv==1.0.0
 speechbrain==0.5.13
 torchaudio==2.0.1
 yt_dlp==2023.3.4

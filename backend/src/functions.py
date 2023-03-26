@@ -52,6 +52,8 @@ def split_wav(filename, path, time):
     
 def download_file(url,hex_dig):
    path="../temp/"+hex_dig+"/"
+   if os.path.exists(path):
+       return
    os.makedirs(path)
    ydl_opts = {
 	"format": "bestaudio/best",

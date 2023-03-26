@@ -1,4 +1,4 @@
-backend/temp/*
-!backend/temp/
-backend/tmp/
-backend/__pycache__/
+backend/.env
+backend/temp/
+backend/src/tmp/
+backend/src/__pycache__/

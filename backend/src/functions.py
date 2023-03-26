@@ -41,8 +41,7 @@ def split_wav(filename, path, time):
         outFilename = path+"output_%s.wav" % i
         outFile = wave.open(outFilename, "w")
         outFile.setparams(read.getparams())
-        for j in range(framesPerSplit):
-            outFile.writeframes(read.readframes(1))
+        outFile.writeframes(read.readframes(framesPerSplit))
         outFile.close()
         signal = language_id.load_audio(outFilename, savedir=path)
         prediction =  language_id.classify_batch(signal)

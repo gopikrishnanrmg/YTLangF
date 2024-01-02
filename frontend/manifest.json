@@ -1,0 +1,21 @@
+{
+    "name": "YTLangF",
+    "version": "0.0.0.1",
+    "manifest_version": 3,
+    "description": "Extension to extract and render youtube video languages.",
+    "icons": {
+        "16": "icons/icons8-youtube-16.png",
+        "32": "icons/icons8-youtube-32.png",
+        "48": "icons/icons8-youtube-48.png",
+        "128": "icons/icons8-youtube-128.png"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://www.youtube.com/results?search_query=*"],
+        "js": ["YTLangF/YTLangF.js"]
+      }
+    ],
+    "action": {
+        "default_popup": "YTLangF/YTLangF.html"
+    }
+}

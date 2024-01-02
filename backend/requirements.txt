@@ -1,4 +1,6 @@
 fastapi==0.95.0
+uvloop==0.14.0
+httptools==0.1.*
 pydantic==1.10.4
 pymongo==4.3.3
 python-dotenv==1.0.0

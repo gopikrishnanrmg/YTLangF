@@ -49,7 +49,7 @@ def split_wav(filename, path, time):
     read.close()
     return list(set(langs))
     
-def download_file(url,hex_dig):
+def download_file(url, hex_dig, count_list):
    path="../temp/"+hex_dig+"/"
    if os.path.exists(path):
        return
@@ -69,4 +69,5 @@ def download_file(url,hex_dig):
    shutil.rmtree(path)
    print(str(langs))
    add_record(hex_dig,langs)
-   
+   count_list[0] = count_list[0]-1
+   print("count is "+str(count_list[0]))

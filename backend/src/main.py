@@ -1,9 +1,24 @@
 from fastapi import FastAPI, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 import hashlib
 import threading
 import functions
 
+count_list = [0]
+
 app = FastAPI()
+
+origins = [
+    "https://www.youtube.com",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup_event():
@@ -18,6 +33,10 @@ async def fetch_video(url: str, background_tasks: BackgroundTasks):
    if record:
        return {"status": "success", "message": str(record)}
    else:
-       background_tasks.add_task(functions.download_file, url, hexDig)
+       while(count_list[0]>4):
+           pass     
+       count_list[0] = count_list[0]+1
+       print("count is "+str(count_list[0]))
+       background_tasks.add_task(functions.download_file, url, hexDig, count_list)
        return {"status": "failure", "message": "Adding info about this file"}
 

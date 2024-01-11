@@ -1,5 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+from bson import json_util
 import hashlib
 import threading
 import functions
@@ -31,9 +32,9 @@ async def fetch_video(url: str, background_tasks: BackgroundTasks):
    hexDig = hashObject.hexdigest()
    record = functions.find_record(hexDig)
    if record:
-       return {"status": "success", "message": str(record)}
+       return {"status": "success", "message": str(json_util.dumps(record))}
    else:
-       while(count_list[0]>4):
+       while(count_list[0]>2):
            pass     
        count_list[0] = count_list[0]+1
        print("count is "+str(count_list[0]))

@@ -3,8 +3,10 @@ import wave
 import math
 import torchaudio
 import shutil
-from pymongo import MongoClient
+import configparser
+import variables
 import yt_dlp as youtube_dl
+from pymongo import MongoClient
 from dotenv import load_dotenv
 from models import YTRecord 
 from speechbrain.pretrained import EncoderClassifier
@@ -13,6 +15,25 @@ language_id = EncoderClassifier.from_hparams(source="TalTechNLP/voxlingua107-epa
 client = None
 db = None
 collection = None
+
+
+def init():
+    config = configparser.ConfigParser()
+    if os.path.exists(variables.configFilePath):
+        config.read(variables.configFilePath)
+        variables.maxFileSize = int(config.get("Settings", "maxFileSize"))
+        variables.maxThreads = int(config.get("Settings", "maxThreads"))
+        variables.tempFolderPath = config.get("Settings", "tempFolderPath")
+        variables.timeSlice = int(config.get("Settings", "timeSlice"))
+    else:
+        config.add_section("Settings")
+        config.set("Settings", "maxFileSize", str(1073741824))
+        config.set("Settings", "maxThreads", str(2))
+        config.set("Settings", "tempFolderPath", "../temp/")
+        config.set("Settings", "timeSlice", str(100))
+        with open(variables.configFilePath, "w") as f:
+            config.write(f)
+
 
 def set_mongo_client():
     global client, db, collection
@@ -29,13 +50,13 @@ def add_record(hash,langs):
     record = YTRecord(YTHash=hash, langs=langs)
     collection.insert_one(record.dict(by_alias=True))
 
-def split_wav(filename, path, time):
+def split_wav(filename, path):
     langs = []
     read = wave.open(filename, "r")
     frameRate = read.getframerate()
     numFrames = read.getnframes()
     duration = numFrames / float(frameRate)
-    numSplits = int(math.ceil(duration / time))
+    numSplits = int(math.ceil(duration / variables.timeSlice))
     framesPerSplit = int(numFrames / numSplits)
     for i in range(numSplits):
         outFilename = path+"output_%s.wav" % i
@@ -50,7 +71,7 @@ def split_wav(filename, path, time):
     return list(set(langs))
     
 def download_file(url, hex_dig, count_list):
-   path="../temp/"+hex_dig+"/"
+   path = variables.tempFolderPath+hex_dig+"/"
    if os.path.exists(path):
        return
    os.makedirs(path)
@@ -65,7 +86,14 @@ def download_file(url, hex_dig, count_list):
    }
    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
        ydl.download([url])
-   langs = split_wav(path+"track.wav", path, 100)
+   file_size = os.path.getsize(path+"track.wav")
+
+   if(file_size > variables.maxFileSize):
+       shutil.rmtree(path)
+       count_list[0] = count_list[0]-1
+       return
+
+   langs = split_wav(path+"track.wav", path)
    shutil.rmtree(path)
    print(str(langs))
    add_record(hex_dig,langs)

@@ -1,4 +1,5 @@
 backend/.env
+backend/config.ini
 backend/temp/
 backend/src/tmp/
 backend/src/__pycache__/

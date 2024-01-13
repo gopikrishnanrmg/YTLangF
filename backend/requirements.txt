@@ -9,3 +9,4 @@ speechbrain==0.5.13
 torchaudio==2.0.1
 yt_dlp==2023.3.4
 configparser==6.0.0
+logger==1.4

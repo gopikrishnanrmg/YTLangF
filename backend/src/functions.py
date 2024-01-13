@@ -4,6 +4,7 @@ import math
 import torchaudio
 import shutil
 import configparser
+import logging
 import variables
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
@@ -23,17 +24,26 @@ def init():
         config.read(variables.configFilePath)
         variables.maxFileSize = int(config.get("Settings", "maxFileSize"))
         variables.maxThreads = int(config.get("Settings", "maxThreads"))
+        variables.logLevel = config.get("Settings", "logLevel")
         variables.tempFolderPath = config.get("Settings", "tempFolderPath")
         variables.timeSlice = int(config.get("Settings", "timeSlice"))
     else:
+        variables.maxFileSize = 1073741824
+        variables.maxThreads = 2
+        variables.logLevel = "debug"
+        variables.tempFolderPath = "../temp/"
+        variables.timeSlice = 100
         config.add_section("Settings")
         config.set("Settings", "maxFileSize", str(1073741824))
         config.set("Settings", "maxThreads", str(2))
+        config.set("Settings", "logLevel", variables.logLevel)
         config.set("Settings", "tempFolderPath", "../temp/")
         config.set("Settings", "timeSlice", str(100))
         with open(variables.configFilePath, "w") as f:
             config.write(f)
 
+    variables.logger = logging.getLogger(__name__)
+    variables.logger.setLevel(getattr(logging, variables.logLevel.upper()))
 
 def set_mongo_client():
     global client, db, collection
@@ -89,13 +99,14 @@ def download_file(url, hex_dig, count_list):
    file_size = os.path.getsize(path+"track.wav")
 
    if(file_size > variables.maxFileSize):
+       variables.logger.debug("Ignoring url "+str(json_util.dumps(record)))
        shutil.rmtree(path)
        count_list[0] = count_list[0]-1
        return
 
    langs = split_wav(path+"track.wav", path)
    shutil.rmtree(path)
-   print(str(langs))
+   variables.logger.info("YTB "+url+" "+str(langs))
    add_record(hex_dig,langs)
    count_list[0] = count_list[0]-1
-   print("count is "+str(count_list[0]))
+   variables.logger.info("count is "+str(count_list[0]))

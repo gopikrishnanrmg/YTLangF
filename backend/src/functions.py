@@ -86,7 +86,7 @@ def split_wav(filename, path):
     return list(set(langs))
     
 def download_file(url, hex_dig):
-   global lock,count
+   global lock, count
    path = variables.tempFolderPath+hex_dig+"/"
    if os.path.exists(path):
        return
@@ -121,10 +121,10 @@ def download_file(url, hex_dig):
    add_record(hex_dig,langs)
    while lock:
        pass
-       lock = True
-       count = count-1
-       variables.logger.debug("Count decrement is "+str(count))
-       lock = False
+   lock = True
+   count = count-1
+   variables.logger.debug("Count decrement is "+str(count))
+   lock = False
 
 def jobRunner():
     global count

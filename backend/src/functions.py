@@ -5,6 +5,7 @@ import torchaudio
 import shutil
 import configparser
 import logging
+import threading
 import variables
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
@@ -16,7 +17,8 @@ language_id = EncoderClassifier.from_hparams(source="TalTechNLP/voxlingua107-epa
 client = None
 db = None
 collection = None
-
+lock = False
+count = 0
 
 def init():
     config = configparser.ConfigParser()
@@ -44,6 +46,9 @@ def init():
 
     variables.logger = logging.getLogger(__name__)
     variables.logger.setLevel(getattr(logging, variables.logLevel.upper()))
+
+    variables.jobThread = threading.Thread(target=jobRunner)
+    variables.jobThread.start()
 
 def set_mongo_client():
     global client, db, collection
@@ -80,7 +85,8 @@ def split_wav(filename, path):
     read.close()
     return list(set(langs))
     
-def download_file(url, hex_dig, count_list):
+def download_file(url, hex_dig):
+   global lock,count
    path = variables.tempFolderPath+hex_dig+"/"
    if os.path.exists(path):
        return
@@ -101,12 +107,33 @@ def download_file(url, hex_dig, count_list):
    if(file_size > variables.maxFileSize):
        variables.logger.debug("Ignoring url "+str(json_util.dumps(record)))
        shutil.rmtree(path)
-       count_list[0] = count_list[0]-1
+       while lock:
+           pass
+       lock = True
+       count = count-1
+       variables.logger.debug("Count decrement is "+str(count))
+       lock = False
        return
 
    langs = split_wav(path+"track.wav", path)
    shutil.rmtree(path)
    variables.logger.info("YTB "+url+" "+str(langs))
    add_record(hex_dig,langs)
-   count_list[0] = count_list[0]-1
-   variables.logger.info("count is "+str(count_list[0]))
+   while lock:
+       pass
+       lock = True
+       count = count-1
+       variables.logger.debug("Count decrement is "+str(count))
+       lock = False
+
+def jobRunner():
+    global count
+    while (True):
+            for job in variables.jobURLList:
+                while(count >= variables.maxThreads):
+                    pass
+                count = count+1
+                variables.logger.debug("Count increment is "+str(count))
+                variables.logger.debug("Processing job "+str(job))
+                threading.Thread(target=download_file, args=(job["url"], job["hash"])).start()
+                variables.jobURLList.remove(job)

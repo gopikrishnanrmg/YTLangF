@@ -10,7 +10,7 @@ import variables
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from models import YTRecord 
+from models import YTRecord
 from speechbrain.pretrained import EncoderClassifier
 language_id = EncoderClassifier.from_hparams(source="TalTechNLP/voxlingua107-epaca-tdnn", savedir="tmp")
 
@@ -44,6 +44,7 @@ def init():
         with open(variables.configFilePath, "w") as f:
             config.write(f)
 
+    logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     variables.logger = logging.getLogger(__name__)
     variables.logger.setLevel(getattr(logging, variables.logLevel.upper()))
 
@@ -60,7 +61,7 @@ def set_mongo_client():
 
 def find_record(hash):
     return collection.find_one({"YTHash": hash})
-    
+
 def add_record(hash,langs):
     record = YTRecord(YTHash=hash, langs=langs)
     collection.insert_one(record.dict(by_alias=True))
@@ -84,7 +85,7 @@ def split_wav(filename, path):
         langs.append(prediction[3][0])
     read.close()
     return list(set(langs))
-    
+
 def download_file(url, hex_dig):
    global lock, count
    path = variables.tempFolderPath+hex_dig+"/"

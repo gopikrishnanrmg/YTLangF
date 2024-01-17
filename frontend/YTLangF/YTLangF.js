@@ -19,7 +19,7 @@ async function parseElements() {
 
       if (data["status"] === "success") {
         categorized.push(url);
-        content_box[i].innerHTML += "<br>" + JSON.stringify(JSON.parse(data['message'])['langs']);
+        content_box[i].innerHTML += "<br> <b>Languages:</b> " + JSON.parse(data["message"])["langs"].toString().replace(/"/g, "");
       }
     }
   }

@@ -5,7 +5,7 @@ async function parseElements() {
     "yt-simple-endpoint inline-block style-scope ytd-thumbnail"
   );
   const content_box = document.getElementsByClassName(
-    "text-wrapper style-scope ytd-video-renderer"
+    "metadata-snippet-text style-scope ytd-video-renderer"
   );
   for (var i = 0; i < content.length; i++) {
     var url = content[i].getAttribute("href");
@@ -19,8 +19,7 @@ async function parseElements() {
 
       if (data["status"] === "success") {
         categorized.push(url);
-        content_box[i].innerText +=
-          "\n" + JSON.stringify(JSON.parse(data["message"])["langs"]);
+        content_box[i].innerHTML += "<br>" + JSON.stringify(JSON.parse(data['message'])['langs']);
       }
     }
   }

@@ -1,3 +1,4 @@
+#Variables file contains variables which are used in multiple files
 configFilePath = "../config.ini"
 maxFileSize = None
 maxThreads = None

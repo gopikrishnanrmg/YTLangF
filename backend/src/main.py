@@ -9,6 +9,8 @@ from bson import json_util
 
 app = FastAPI()
 
+#Enable requests from youtube.com as the API requests are fired by the content script
+
 origins = [
     "https://www.youtube.com",
 ]
@@ -21,10 +23,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#Intialize the server
+
 @app.on_event("startup")
 async def startup_event():
     functions.init()
     functions.set_mongo_client()
+
+#The primary API dealing with classification of youtube video based on languages, if a record 
+#is found it is returned else we add it to the jobURLList for further processing
 
 @app.get("/video/{url:path}")
 async def fetch_video(url: str):

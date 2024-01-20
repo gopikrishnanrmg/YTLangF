@@ -1,5 +1,10 @@
 var categorized = [];
 
+/**
+ * The function picks all the videos and its URL and requests the backend code for the result
+ * This request is sent periodically as new videos may be populated on the user's view.
+ */
+
 async function parseElements() {
   const content = document.getElementsByClassName(
     "yt-simple-endpoint inline-block style-scope ytd-thumbnail"

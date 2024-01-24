@@ -2,7 +2,7 @@
 YTLangF is a project to classify YouTube videos on your YouTube search page according to their language. How often have you searched for a topic on YouTube and clicked a video that had its title in say "English" and the video's content was not in English? So this project is aimed towards preventing such clickbaits on the Youtube platform.
 
 ## Requirements
-- An x64-based Linux system (preferably an Ubuntu-based distro)
+- An x64-based Ubuntu-based system
 - Any chromium-based browser
 
 ## Installation instructions
@@ -14,7 +14,7 @@ Enable developer mode in your Chromium-based browser and drag and drop the front
 ### Backend
 Create an account on MongoDB Atlas with a free cluster option and add a .env file in the "Backend" folder having your credentials to Atlas. The format of the file should look like this:
 
-MONGODB_URI="mongodb+srv://<user>:<password>@cluster0.abuudvk.mongodb.net/?retryWrites=true&w=majority"
+MONGODB_URI="mongodb+srv://&lt;user&gt;:&lt;password&gt;@cluster0.abuudvk.mongodb.net/?retryWrites=true&w=majority"
 
 Make sure you have superuser permission and run:
 
@@ -24,3 +24,5 @@ chmod +x install.sh
 cd src/
 uvicorn main:app --reload
 ```
+### Config File
+A config.ini file will be generated when the application is executed initially. You may tweak the parameters in this file according to your system's performance.

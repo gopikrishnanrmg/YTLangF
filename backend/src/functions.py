@@ -7,6 +7,7 @@ import configparser
 import logging
 import threading
 import variables
+import subprocess
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -49,6 +50,8 @@ def init():
     logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     variables.logger = logging.getLogger(__name__)
     variables.logger.setLevel(getattr(logging, variables.logLevel.upper()))
+    
+    ipfsDaemon()
 
     variables.jobThread = threading.Thread(target=jobRunner)
     variables.jobThread.start()
@@ -62,6 +65,13 @@ def set_mongo_client():
     client = MongoClient(mongouri)
     db = client["YT"]
     collection = db["records"]
+
+#Start ipfs daemon to begin listening on the program
+
+def ipfsDaemon():
+    command = "ipfs shutdown && ipfs daemon"
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
 
 #Searches MongoDB for records
 

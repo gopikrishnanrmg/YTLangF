@@ -39,11 +39,11 @@ def init():
         variables.tempFolderPath = "../temp/"
         variables.timeSlice = 100
         config.add_section("Settings")
-        config.set("Settings", "maxFileSize", str(1073741824))
-        config.set("Settings", "maxThreads", str(2))
+        config.set("Settings", "maxFileSize", str(variables.maxFileSize))
+        config.set("Settings", "maxThreads", str(variables.maxThreads))
         config.set("Settings", "logLevel", variables.logLevel)
-        config.set("Settings", "tempFolderPath", "../temp/")
-        config.set("Settings", "timeSlice", str(100))
+        config.set("Settings", "tempFolderPath", variables.tempFolderPath)
+        config.set("Settings", "timeSlice", str(variables.timeSlice))
         with open(variables.configFilePath, "w") as f:
             config.write(f)
 

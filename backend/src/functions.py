@@ -32,18 +32,23 @@ def init():
         variables.logLevel = config.get("Settings", "logLevel")
         variables.tempFolderPath = config.get("Settings", "tempFolderPath")
         variables.timeSlice = int(config.get("Settings", "timeSlice"))
+        variables.listenPort = int(config.get("Settings", "listenPort"))
     else:
         variables.maxFileSize = 1073741824
         variables.maxThreads = 2
         variables.logLevel = "debug"
         variables.tempFolderPath = "../temp/"
         variables.timeSlice = 100
+        variables.listenPort = 8080
         config.add_section("Settings")
+        config.set("Settings", "maxFileSize", str(variables.maxFileSize))
+        config.set("Settings", "maxThreads", str(variables.maxThreads))
         config.set("Settings", "maxFileSize", str(variables.maxFileSize))
         config.set("Settings", "maxThreads", str(variables.maxThreads))
         config.set("Settings", "logLevel", variables.logLevel)
         config.set("Settings", "tempFolderPath", variables.tempFolderPath)
         config.set("Settings", "timeSlice", str(variables.timeSlice))
+        config.set("Settings", "listenPort", str(variables.listenPort))
         with open(variables.configFilePath, "w") as f:
             config.write(f)
 
@@ -72,6 +77,10 @@ def ipfsDaemon():
     command = "ipfs shutdown && ipfs daemon"
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
+
+def listen():
+    command = " ipfs p2p listen /x/" + application + "/1.0 /ip4/127.0.0.1/tcp/" + port;
+
 
 #Searches MongoDB for records
 

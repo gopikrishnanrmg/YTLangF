@@ -7,4 +7,5 @@ timeSlice = None
 logLevel = None
 logger = None
 jobThread = None #Keeping it here in case we need to access the job runner later on in multiple files
+listenPort = None
 jobURLList = []

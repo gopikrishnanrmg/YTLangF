@@ -79,8 +79,12 @@ def ipfsDaemon():
     stdout, stderr = process.communicate()
 
 def listen():
-    command = " ipfs p2p listen /x/" + application + "/1.0 /ip4/127.0.0.1/tcp/" + port;
+    command = "ipfs p2p listen /x/commChannel/1.0 /ip4/127.0.0.1/tcp/" + port
+    subprocess.run(command, shell=True)
 
+def closeListen():
+    command = "ipfs p2p close /x/commChannel/1.0 /ip4/127.0.0.1/tcp/" + port
+    subprocess.run(command, shell=True)
 
 #Searches MongoDB for records
 

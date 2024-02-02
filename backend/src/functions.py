@@ -8,6 +8,7 @@ import logging
 import threading
 import variables
 import subprocess
+import rsa
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -36,6 +37,16 @@ def init():
         variables.socketBufferSize = int(config.get("Settings", "socketBufferSize"))
         variables.appname = config.get("Settings", "appname")
 
+        with open(variables.keyPath+"public_key.pem", "rb") as public_key_file:
+            public_key_pem = public_key_file.read()
+        
+        variables.publicKey = rsa.PublicKey.load_pkcs1(public_key_pem)
+
+        with open(variables.keyPath+"private_key.pem", "rb") as private_key_file:
+            private_key_pem = private_key_file.read()
+
+        variables.privateKey = rsa.PrivateKey.load_pkcs1(private_key_pem)
+
     else:
         variables.maxFileSize = 1073741824
         variables.maxThreads = 2
@@ -59,6 +70,15 @@ def init():
 
         with open(variables.configFilePath, "w") as f:
             config.write(f)
+            
+        KEY_LENGTH = 2048
+        variables.publicKey, variables.privateKey = rsa.newkeys(KEY_LENGTH)
+
+        with open(variables.keyPath+"public_key.pem", "wb") as public_key_file:
+            public_key_file.write(variables.publicKey.save_pkcs1())
+
+        with open(variables.keyPath+"private_key.pem", "wb") as private_key_file:
+            private_key_file.write(variables.privateKey.save_pkcs1())
 
     logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     variables.logger = logging.getLogger(__name__)

@@ -9,3 +9,4 @@ torchaudio==2.0.1
 yt_dlp==2023.12.30
 configparser==6.0.0
 logger==1.4
+rsa==4.9  

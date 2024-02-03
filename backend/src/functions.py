@@ -106,14 +106,28 @@ def ipfsDaemon():
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
 
+#Fetch other nodes to connect to
+
+def ipfsSwarmPeers():
+    command = "ipfs swarm peers | awk -F'/' '{print $NF}'"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    peer_ids = result.stdout.strip().split('\n')
+    return peer_ids
+
+#Connect to other nodes
+
 def ipfsForward(peerID):
     command = "ipfs p2p forward /x/" + variables.appname + "/1.0 /ip4/127.0.0.1/tcp/" + port + " /p2p/"
                 + peerID
     subprocess.run(command, shell=True)
 
+#Start service for other nodes to connect to
+
 def ipfsListen():
     command = "ipfs p2p listen /x/" + variables.appname + "/1.0 /ip4/127.0.0.1/tcp/" + port
     subprocess.run(command, shell=True)
+
+#Close an existing connection
 
 def closeIpfsListen():
     command = "ipfs p2p close /x/" + variables.appname + "/1.0 /ip4/127.0.0.1/tcp/" + port

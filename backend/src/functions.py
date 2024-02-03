@@ -144,9 +144,9 @@ def download_file(url, hex_dig):
 
 def jobRunner():
     global count
-    while (True):
+    while True:
             for job in variables.jobURLList:
-                while(count >= variables.maxThreads):
+                while count >= variables.maxThreads:
                     pass
                 count = count+1
                 variables.logger.debug("Count increment is "+str(count))

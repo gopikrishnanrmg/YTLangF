@@ -11,6 +11,7 @@ publicKey = None
 privateKey = None
 jobThread = None #Keeping it here in case we need to access the job runner later on in multiple files
 listenPort = None
+sendPort = None
 socketBufferSize = None
 appname = None
 jobURLList = []

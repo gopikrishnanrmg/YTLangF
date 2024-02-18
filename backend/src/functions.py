@@ -34,6 +34,7 @@ def init():
         variables.tempFolderPath = config.get("Settings", "tempFolderPath")
         variables.timeSlice = int(config.get("Settings", "timeSlice"))
         variables.listenPort = int(config.get("Settings", "listenPort"))
+        variables.sendPort = int(config.get("Settings", "sendPort"))
         variables.socketBufferSize = int(config.get("Settings", "socketBufferSize"))
         variables.appname = config.get("Settings", "appname")
 
@@ -54,6 +55,7 @@ def init():
         variables.tempFolderPath = "../temp/"
         variables.timeSlice = 100
         variables.listenPort = 8080
+        variables.sendPort = 8081
         variables.socketBufferSize = 4096
         variables.appname = "YTLangF"
         config.add_section("Settings")
@@ -65,6 +67,7 @@ def init():
         config.set("Settings", "tempFolderPath", variables.tempFolderPath)
         config.set("Settings", "timeSlice", str(variables.timeSlice))
         config.set("Settings", "listenPort", str(variables.listenPort))
+        config.set("Settings", "sendPort", str(variables.sendPort))
         config.set("Settings", "socketBufferSize", str(variables.socketBufferSize))
         config.set("Settings", "appname", str(variables.appname))
 
@@ -117,20 +120,19 @@ def ipfsSwarmPeers():
 #Connect to other nodes
 
 def ipfsForward(peerID):
-    command = "ipfs p2p forward /x/" + variables.appname + "/1.0 /ip4/127.0.0.1/tcp/" + port + " /p2p/"
-                + peerID
+    command = "ipfs p2p forward /x/" + str(variables.appname) + "/1.0 /ip4/127.0.0.1/tcp/" + str(variables.sendPort) + " /p2p/" + str(peerID)
     subprocess.run(command, shell=True)
 
 #Start service for other nodes to connect to
 
 def ipfsListen():
-    command = "ipfs p2p listen /x/" + variables.appname + "/1.0 /ip4/127.0.0.1/tcp/" + port
+    command = "ipfs p2p listen /x/" + str(variables.appname) + "/1.0 /ip4/127.0.0.1/tcp/" + str(variables.listenPort)
     subprocess.run(command, shell=True)
 
 #Close an existing connection
 
 def closeIpfsListen():
-    command = "ipfs p2p close /x/" + variables.appname + "/1.0 /ip4/127.0.0.1/tcp/" + port
+    command = "ipfs p2p close /x/" + str(variables.appname) + "/1.0 /ip4/127.0.0.1/tcp/" + str(variables.listenPort)
     subprocess.run(command, shell=True)
 
 #Searches MongoDB for records

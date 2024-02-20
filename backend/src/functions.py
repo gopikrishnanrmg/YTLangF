@@ -8,6 +8,8 @@ import logging
 import threading
 import variables
 import subprocess
+#import p2pSender
+#import p2pListener
 import rsa
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
@@ -36,6 +38,7 @@ def init():
         variables.listenPort = int(config.get("Settings", "listenPort"))
         variables.sendPort = int(config.get("Settings", "sendPort"))
         variables.socketBufferSize = int(config.get("Settings", "socketBufferSize"))
+        variables.waitTimeThreshold = int(config.get("Settings", "waitTimeThreshold"))
         variables.appname = config.get("Settings", "appname")
 
         with open(variables.keyPath+"public_key.pem", "rb") as public_key_file:
@@ -57,6 +60,7 @@ def init():
         variables.listenPort = 8080
         variables.sendPort = 8081
         variables.socketBufferSize = 4096
+        variables.waitTimeThreshold = 90
         variables.appname = "YTLangF"
         config.add_section("Settings")
         config.set("Settings", "maxFileSize", str(variables.maxFileSize))
@@ -69,8 +73,9 @@ def init():
         config.set("Settings", "listenPort", str(variables.listenPort))
         config.set("Settings", "sendPort", str(variables.sendPort))
         config.set("Settings", "socketBufferSize", str(variables.socketBufferSize))
+        config.set("Settings", "waitTimeThreshold", str(variables.waitTimeThreshold))
         config.set("Settings", "appname", str(variables.appname))
-
+        
         with open(variables.configFilePath, "w") as f:
             config.write(f)
             
@@ -88,9 +93,14 @@ def init():
     variables.logger.setLevel(getattr(logging, variables.logLevel.upper()))
     
     ipfsDaemon()
-
+    
     variables.jobThread = threading.Thread(target=jobRunner)
     variables.jobThread.start()
+
+    from p2pListener import serverListen
+
+    variables.listenerThread = threading.Thread(target=serverListen)
+    variables.listenerThread.start()
 
 #Connects with the instance of mongoDB based on the value given in the .env fie
 
@@ -129,7 +139,13 @@ def ipfsListen():
     command = "ipfs p2p listen /x/" + str(variables.appname) + "/1.0 /ip4/127.0.0.1/tcp/" + str(variables.listenPort)
     subprocess.run(command, shell=True)
 
-#Close an existing connection
+#Close an existing forward connection
+
+def ipfsP2PClose(peerID):
+    command = "ipfs p2p close -t /ipfs/" + str(peerID)
+    subprocess.run(command, shell=True)
+
+#Close an existing listen connection
 
 def closeIpfsListen():
     command = "ipfs p2p close /x/" + str(variables.appname) + "/1.0 /ip4/127.0.0.1/tcp/" + str(variables.listenPort)
@@ -193,24 +209,26 @@ def download_file(url, hex_dig):
    if(file_size > variables.maxFileSize):
        variables.logger.debug("Ignoring url "+str(json_util.dumps(record)))
        shutil.rmtree(path)
-       while lock:
-           pass
-       lock = True
-       count = count-1
-       variables.logger.debug("Count decrement is "+str(count))
-       lock = False
        return
 
    langs = split_wav(path+"track.wav", path)
    shutil.rmtree(path)
    variables.logger.info("YTB "+url+" "+str(langs))
    add_record(hex_dig,langs)
-   while lock:
-       pass
-   lock = True
-   count = count-1
-   variables.logger.debug("Count decrement is "+str(count))
-   lock = False
+
+#Function that process the individual jobs
+
+def jobHandler(url, hex_dig):
+    from p2pSender import clientSend
+    if clientSend(hex_dig):
+        download_file(url, hex_dig)
+    
+    while lock:
+        pass
+    lock = True
+    count = count-1
+    variables.logger.debug("Count decrement is "+str(count))
+    lock = False
 
 #Function to spawn threads to handle multiple jobs pushed in the jobURLList 
 
@@ -223,5 +241,5 @@ def jobRunner():
                 count = count+1
                 variables.logger.debug("Count increment is "+str(count))
                 variables.logger.debug("Processing job "+str(job))
-                threading.Thread(target=download_file, args=(job["url"], job["hash"])).start()
+                threading.Thread(target=jobHandler, args=(job["url"], job["hash"])).start()
                 variables.jobURLList.remove(job)

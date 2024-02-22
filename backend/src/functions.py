@@ -57,8 +57,8 @@ def init():
         variables.logLevel = "debug"
         variables.tempFolderPath = "../temp/"
         variables.timeSlice = 100
-        variables.listenPort = 8080
-        variables.sendPort = 8081
+        variables.listenPort = 8081
+        variables.sendPort = 8082
         variables.socketBufferSize = 4096
         variables.waitTimeThreshold = 90
         variables.appname = "YTLangF"
@@ -92,8 +92,6 @@ def init():
     variables.logger = logging.getLogger(__name__)
     variables.logger.setLevel(getattr(logging, variables.logLevel.upper()))
     
-    ipfsDaemon()
-    
     variables.jobThread = threading.Thread(target=jobRunner)
     variables.jobThread.start()
 
@@ -111,13 +109,6 @@ def set_mongo_client():
     client = MongoClient(mongouri)
     db = client["YT"]
     collection = db["records"]
-
-#Start ipfs daemon to begin listening on the program
-
-def ipfsDaemon():
-    command = "ipfs shutdown && ipfs daemon"
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
 
 #Fetch other nodes to connect to
 

@@ -3,7 +3,7 @@ import variables
 import time
 import logging
 import functions
-
+import json
 def clientSend(hexDig):
     flag = False
     peer_ids = functions.ipfsSwarmPeers()
@@ -17,10 +17,12 @@ def clientSend(hexDig):
         data = (s.recv(variables.socketBufferSize)).decode() #validate the data here, check if its of the right format, later can add signature schema
         variables.logger.debug("Recieved " + str(data) + " sent to "+ str(peer_id))
         try:
-            if not (isinstance(data, (int)) and data == variables.socketRecordNA):
-                langs = record.get("langs")
+            if not data == variables.socketRecordNA:
+                data = json.loads(data)
+                langs = data.get("langs")
                 flag = True
         except Exception as e:
+            variables.logger.debug(str(e))
             variables.logger.debug("Cannot parse " + str(data) + " received from "+ str(peer_id))
         
         s.close()

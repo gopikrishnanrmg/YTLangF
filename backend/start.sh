@@ -1,4 +1,5 @@
 ipfs shutdown
+sudo systemctl start mongod
 ipfs daemon &
 while true; 
     do 

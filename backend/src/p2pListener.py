@@ -2,6 +2,7 @@ import socket
 import variables
 import functions
 import logging
+from bson import json_util
 
 def serverListen():
     functions.ipfsListen()
@@ -15,7 +16,7 @@ def serverListen():
         record = functions.find_record(data.decode())
         if record:
             variables.logger.debug("Found record for " + str(data.decode()) + " : " + str(record))
-            client_socket.send(record.encode())
+            client_socket.send(str(json_util.dumps(record)).encode())
         else:
             variables.logger.debug("Cannot find record for " + str(data.decode()))
             client_socket.send(variables.socketRecordNA.encode())

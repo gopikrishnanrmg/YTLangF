@@ -3,3 +3,5 @@ backend/config.ini
 backend/temp/
 backend/src/tmp/
 backend/src/__pycache__/
+backend/private_key.pem
+backend/public_key.pem

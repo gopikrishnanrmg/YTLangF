@@ -103,8 +103,9 @@ def init():
 def set_mongo_client():
     global client, db, collection
     load_dotenv()
-    mongouri = os.getenv("MONGODB_URI")
-    client = MongoClient(mongouri)
+    #mongouri = os.getenv("MONGODB_URI")
+    #client = MongoClient(mongouri)
+    client = MongoClient()
     db = client["YT"]
     collection = db["records"]
 

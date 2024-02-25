@@ -2,10 +2,11 @@ import socket
 import variables
 import time
 import logging
+import functions
 
 def clientSend(hexDig):
     flag = False
-    peer_ids = ipfsSwarmPeers()
+    peer_ids = functions.ipfsSwarmPeers()
     start_time = time.perf_counter()
     for peer_id in peer_ids:
         variables.logger.debug("Request sent to " + str(peer_id))
@@ -23,7 +24,7 @@ def clientSend(hexDig):
             variables.logger.debug("Cannot parse " + str(data) + " received from "+ str(peer_id))
         
         s.close()
-        functions.ipfsP2PClose(peerID)
+        functions.ipfsP2PClose(peer_id)
 
         if time.time()-start_time > variables.waitTimeThreshold and flag:
             functions.add_record(hexDig,langs)

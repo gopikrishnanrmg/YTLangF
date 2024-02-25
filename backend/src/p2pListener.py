@@ -20,5 +20,3 @@ def serverListen():
             variables.logger.debug("Cannot find record for " + str(data.decode()))
             client_socket.send(variables.socketRecordNA.encode())
         client_socket.close()
-
-serverListen()

@@ -1,10 +1,10 @@
 ipfs_version=v0.26.0
-apt install -y python3 python3-pip uvicorn ffmpeg
+sudo apt install -y python3 python3-pip uvicorn ffmpeg
 pip3 install -r requirements.txt
 wget https://dist.ipfs.tech/kubo/${ipfs_version}/kubo_${ipfs_version}_linux-amd64.tar.gz
 tar -xvzf kubo_${ipfs_version}_linux-amd64.tar.gz
 cd kubo
-bash install.sh
+sudo bash install.sh
 ipfs init
 ipfs config Routing.Type dht
 ipfs config --json Experimental.Libp2pStreamMounting true

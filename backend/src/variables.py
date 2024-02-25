@@ -14,6 +14,6 @@ listenerThread = None
 listenPort = None
 sendPort = None
 socketBufferSize = None
-socketRecordNA = 400
+socketRecordNA = "400"
 appname = None
 jobURLList = []

@@ -8,8 +8,8 @@ import logging
 import threading
 import variables
 import subprocess
-#import p2pSender
-#import p2pListener
+import p2pSender
+import p2pListener
 import rsa
 import yt_dlp as youtube_dl
 from pymongo import MongoClient
@@ -95,9 +95,7 @@ def init():
     variables.jobThread = threading.Thread(target=jobRunner)
     variables.jobThread.start()
 
-    from p2pListener import serverListen
-
-    variables.listenerThread = threading.Thread(target=serverListen)
+    variables.listenerThread = threading.Thread(target=p2pListener.serverListen)
     variables.listenerThread.start()
 
 #Connects with the instance of mongoDB based on the value given in the .env fie
@@ -210,8 +208,8 @@ def download_file(url, hex_dig):
 #Function that process the individual jobs
 
 def jobHandler(url, hex_dig):
-    from p2pSender import clientSend
-    if clientSend(hex_dig):
+    global lock, count
+    if p2pSender.clientSend(hex_dig):
         download_file(url, hex_dig)
     
     while lock:

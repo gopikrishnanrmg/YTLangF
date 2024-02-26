@@ -41,15 +41,6 @@ def init():
         variables.waitTimeThreshold = int(config.get("Settings", "waitTimeThreshold"))
         variables.appname = config.get("Settings", "appname")
 
-        with open(variables.keyPath+"public_key.pem", "rb") as public_key_file:
-            public_key_pem = public_key_file.read()
-        
-        variables.publicKey = rsa.PublicKey.load_pkcs1(public_key_pem)
-
-        with open(variables.keyPath+"private_key.pem", "rb") as private_key_file:
-            private_key_pem = private_key_file.read()
-
-        variables.privateKey = rsa.PrivateKey.load_pkcs1(private_key_pem)
 
     else:
         variables.maxFileSize = 1073741824
@@ -79,14 +70,6 @@ def init():
         with open(variables.configFilePath, "w") as f:
             config.write(f)
             
-        KEY_LENGTH = 2048
-        variables.publicKey, variables.privateKey = rsa.newkeys(KEY_LENGTH)
-
-        with open(variables.keyPath+"public_key.pem", "wb") as public_key_file:
-            public_key_file.write(variables.publicKey.save_pkcs1())
-
-        with open(variables.keyPath+"private_key.pem", "wb") as private_key_file:
-            private_key_file.write(variables.privateKey.save_pkcs1())
 
     logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     variables.logger = logging.getLogger(__name__)
@@ -94,6 +77,8 @@ def init():
     
     variables.jobThread = threading.Thread(target=jobRunner)
     variables.jobThread.start()
+
+    ipfsBoostrapNodes()
 
     variables.listenerThread = threading.Thread(target=p2pListener.serverListen)
     variables.listenerThread.start()
@@ -103,8 +88,6 @@ def init():
 def set_mongo_client():
     global client, db, collection
     load_dotenv()
-    #mongouri = os.getenv("MONGODB_URI")
-    #client = MongoClient(mongouri)
     client = MongoClient()
     db = client["YT"]
     collection = db["records"]
@@ -116,6 +99,13 @@ def ipfsSwarmPeers():
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     peer_ids = result.stdout.strip().split('\n')
     return peer_ids
+
+#Fetch the bootstrap nodes of the current configuration
+
+def ipfsBoostrapNodes():
+    command = "ipfs bootstrap list | awk -F'/' '{print $NF}'"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    variables.bootstrapNodes = result.stdout.strip().split('\n')
 
 #Connect to other nodes
 

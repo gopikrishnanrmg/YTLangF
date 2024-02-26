@@ -4,11 +4,26 @@ import time
 import logging
 import functions
 import json
+
 def clientSend(hexDig):
     flag = False
     peer_ids = functions.ipfsSwarmPeers()
     start_time = time.perf_counter()
+
     for peer_id in peer_ids:
+
+        while not variables.connectedNodeLock:
+            pass
+
+        variables.connectedNodeLock = True
+
+        if (str(peer_id) in variables.bootstrapNodes) or (str(peer_id) in variables.connectedNodes):
+            variables.connectedNodeLock = False
+            continue
+    
+        variables.connectedNodes.append(peer_id)
+        variables.connectedNodeLock = False
+
         variables.logger.debug("Request sent to " + str(peer_id))
         functions.ipfsForward(peer_id)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,6 +42,14 @@ def clientSend(hexDig):
         
         s.close()
         functions.ipfsP2PClose(peer_id)
+
+        while not variables.connectedNodeLock:
+            pass
+
+        variables.connectedNodeLock = True
+        
+        variables.connectedNodes.remove(peer_id)
+        variables.connectedNodeLock = False
 
         if time.time()-start_time > variables.waitTimeThreshold and flag:
             functions.add_record(hexDig,langs)

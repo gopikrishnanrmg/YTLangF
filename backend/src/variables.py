@@ -17,3 +17,6 @@ socketBufferSize = None
 socketRecordNA = "400"
 appname = None
 jobURLList = []
+bootstrapNodes = None
+connectedNodes = []
+connectedNodeLock = False

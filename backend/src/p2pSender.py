@@ -12,7 +12,7 @@ def clientSend(hexDig):
 
     for peer_id in peer_ids:
 
-        while not variables.connectedNodeLock:
+        while variables.connectedNodeLock:
             pass
 
         variables.connectedNodeLock = True
@@ -43,7 +43,7 @@ def clientSend(hexDig):
         s.close()
         functions.ipfsP2PClose(peer_id)
 
-        while not variables.connectedNodeLock:
+        while variables.connectedNodeLock:
             pass
 
         variables.connectedNodeLock = True

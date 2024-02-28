@@ -56,4 +56,6 @@ def clientSend(hexDig):
             return False
         elif time.time()-start_time > variables.waitTimeThreshold and not flag:
             return True
+            
+    return True
 

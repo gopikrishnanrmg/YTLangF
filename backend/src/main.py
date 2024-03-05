@@ -46,8 +46,16 @@ async def fetch_video(url: str):
        job = {}
        job["url"] = url
        job["hash"] = hexDig
+
+       while variables.jobLock:
+            pass
+       variables.jobLock = True
+
        if job not in variables.jobURLList:
            variables.jobURLList.append(job)
            variables.logger.debug("Added job "+str(job))
+
+       variables.jobLock = False   
+       
        return {"status": "failure", "message": "Adding info about this file"}
 

@@ -187,7 +187,7 @@ def download_file(url, hex_dig):
    file_size = os.path.getsize(path+"track.wav")
 
    if(file_size > variables.maxFileSize):
-       variables.logger.debug("Ignoring url "+str(json_util.dumps(record)))
+       variables.logger.debug("Ignoring url "+str(url))
        shutil.rmtree(path)
        return
 
@@ -215,11 +215,17 @@ def jobHandler(url, hex_dig):
 def jobRunner():
     global count
     while (True):
-            for job in variables.jobURLList:
-                while(count >= variables.maxThreads):
-                    pass
+
+        if count < variables.maxThreads:
+            while variables.jobLock:
+                pass
+            variables.jobLock = True
+            
+            if len(variables.jobURLList) > 0:
+                job = variables.jobURLList[0]
                 count = count+1
                 variables.logger.debug("Count increment is "+str(count))
                 variables.logger.debug("Processing job "+str(job))
                 threading.Thread(target=jobHandler, args=(job["url"], job["hash"])).start()
                 variables.jobURLList.remove(job)
+            variables.jobLock = False

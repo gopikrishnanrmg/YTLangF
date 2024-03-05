@@ -13,6 +13,7 @@ sendPort = None
 socketBufferSize = None
 socketRecordNA = "400"
 appname = None
+jobLock = False
 jobURLList = []
 bootstrapNodes = None
 connectedNodes = []

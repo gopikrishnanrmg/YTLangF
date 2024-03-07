@@ -10,7 +10,7 @@ async function parseElements() {
     "yt-simple-endpoint inline-block style-scope ytd-thumbnail"
   );
   const content_box = document.getElementsByClassName(
-    "metadata-snippet-text style-scope ytd-video-renderer"
+    "text-wrapper style-scope ytd-video-renderer"
   );
   for (var i = 0; i < content.length; i++) {
     var url = content[i].getAttribute("href");
@@ -24,7 +24,9 @@ async function parseElements() {
 
       if (data["status"] === "success") {
         categorized.push(url);
-        content_box[i].innerHTML += "<br> <b>Languages:</b> " + JSON.parse(data["message"])["langs"].toString().replace(/"/g, "");
+        langElement = document.createElement("div"); 
+        langElement.textContent = "Languages: " + JSON.parse(data["message"])["langs"].toString().replace(/"/g, ""); 
+        content_box[i].appendChild(langElement);
       }
     }
   }

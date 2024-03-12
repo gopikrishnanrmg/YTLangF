@@ -6,14 +6,13 @@ var categorized = [];
  */
 
 async function parseElements() {
-  const content = document.getElementsByClassName(
-    "yt-simple-endpoint inline-block style-scope ytd-thumbnail"
-  );
-  const content_box = document.getElementsByClassName(
-    "text-wrapper style-scope ytd-video-renderer"
-  );
-  for (var i = 0; i < content.length; i++) {
-    var url = content[i].getAttribute("href");
+  vids = document.querySelectorAll('[id="dismissible"]')
+
+  for (var i = 0; i < vids.length; i++) {
+    content = vids[i].getElementsByClassName("yt-simple-endpoint inline-block style-scope ytd-thumbnail");
+    content_box = vids[i].getElementsByClassName("text-wrapper style-scope ytd-video-renderer");
+    
+    var url = content[0].getAttribute("href");
     if (categorized.includes(url)) continue;
 
     if (url !== null && !url.includes("shorts")) {
@@ -26,7 +25,7 @@ async function parseElements() {
         categorized.push(url);
         langElement = document.createElement("div"); 
         langElement.textContent = "Languages: " + JSON.parse(data["message"])["langs"].toString().replace(/"/g, ""); 
-        content_box[i].appendChild(langElement);
+        content_box[0].appendChild(langElement);
       }
     }
   }

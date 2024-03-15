@@ -183,11 +183,18 @@ def download_file(url, hex_dig):
     }],
    }
    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-       ydl.download([url])
+       info_dict = ydl.extract_info(url, download=False)
+       if info_dict.get('is_live', False):
+           variables.logger.debug("Ignoring url because video is currently live: "+str(url))
+           shutil.rmtree(path) 
+           return
+       else: 
+           ydl.download([url])
+
    file_size = os.path.getsize(path+"track.wav")
 
    if(file_size > variables.maxFileSize):
-       variables.logger.debug("Ignoring url "+str(url))
+       variables.logger.debug("Ignoring url because video size exceeds limit: "+str(url))
        shutil.rmtree(path)
        return
 

@@ -18,5 +18,8 @@ ipfs config Routing.Type dht
 ipfs config --json Experimental.Libp2pStreamMounting true
 echo "/key/swarm/psk/1.0.0/
 /base16/
-8828b3b593d8b7b37db860a70460bc2fa7539140f45d7ff855b30a6765c8c947" > ~/.ipfs/swarm.key 
+8828b3b593d8b7b37db860a70460bc2fa7539140f45d7ff855b30a6765c8c947" > ~/.ipfs/swarm.key
+curl -X GET \
+    -H 'Content-Type: application/json' \
+    https://api.jsonsilo.com/public/6b1b0705-688d-4c5f-89a8-08b85c17c048 | jq -r .[] | while read bootstrap; do  ipfs bootstrap add $bootstrap; done  
 rm -r ../kubo*

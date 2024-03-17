@@ -4,10 +4,11 @@ import functions
 import logging
 from bson import json_util
 
+
 def serverListen():
     functions.ipfsListen()
     server_socket = socket.socket()
-    server_socket.bind(("localhost",variables.listenPort))
+    server_socket.bind(("localhost", variables.listenPort))
     while True:
         server_socket.listen()
         (client_socket, address) = server_socket.accept()
@@ -15,9 +16,11 @@ def serverListen():
         variables.logger.debug("Recieved request for " + str(data.decode()))
         record = functions.find_record(data.decode())
         if record:
-            variables.logger.debug("Found record for " + str(data.decode()) + " : " + str(record))
+            variables.logger.debug(
+                "Found record for " + str(data.decode()) + " : " + str(record))
             client_socket.send(str(json_util.dumps(record)).encode())
         else:
-            variables.logger.debug("Cannot find record for " + str(data.decode()))
+            variables.logger.debug(
+                "Cannot find record for " + str(data.decode()))
             client_socket.send(variables.socketRecordNA.encode())
         client_socket.close()
